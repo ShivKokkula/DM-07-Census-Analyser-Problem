@@ -17,33 +17,13 @@ public class CensusAnalyser {
 
     }
 
-    public int loadStateCensusData(String csvFilePath) throws CensusAnalyserException {
-        censusStateMap = new CensusLoader().loadCensusData(csvFilePath,StateCensusCSV.class);
+    public int loadStateCensusData(String... csvFilePath) throws CensusAnalyserException {
+        censusStateMap = new CensusLoader().loadCensusData(StateCensusCSV.class, csvFilePath);
         return censusStateMap.size();
     }
 
-    public int loadIndianStateCode(String csvFilePath) throws CensusAnalyserException {
-        try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
-            ICSVBuilder csvBuilder = CSVBuilderFactory.createCSVBuilder();
-            Iterator<IndianStateCodeCSV> stateCSVIterator = csvBuilder.getCSVFileIterator(reader,IndianStateCodeCSV.class);
-            Iterable<IndianStateCodeCSV> csvIterable = () -> stateCSVIterator;
-            StreamSupport.stream(csvIterable.spliterator(),false)
-                    .filter(csvState -> censusStateMap.get(csvState.state) != null)
-                    .forEach(csvState -> censusStateMap.get(csvState.state).stateCode = csvState.StateCode);
-            return censusStateMap.size();
-        } catch (IOException e) {
-            throw new CensusAnalyserException(e.getMessage(),
-                    CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
-        } catch (RuntimeException e) {
-            throw new CensusAnalyserException(e.getMessage(),
-                    CensusAnalyserException.ExceptionType.INCORRECT_FILE_TYPE);
-        } catch (CSVBuilderException e) {
-            throw new CensusAnalyserException(e.getMessage(),e.type.name());
-        }
-    }
-
-    public int loadUSCensusData(String csvFilePath) throws CensusAnalyserException {
-        censusStateMap = new CensusLoader().loadCensusData(csvFilePath,USCensusCSV.class);
+    public int loadUSCensusData(String... csvFilePath) throws CensusAnalyserException {
+        censusStateMap = new CensusLoader().loadCensusData(USCensusCSV.class, csvFilePath);
         return censusStateMap.size();
     }
 
